@@ -1,9 +1,9 @@
-package Tie::FileSection;
 use strict;
+package Tie::FileSection;
+
 # ABSTRACT: restrict files sequential access using array like boundaries
 require Tie::Handle;
 our @ISA  = qw( Tie::StdHandle );
-our $VERSION = 0.01;
 
 sub new{
    my $pkg = $_[0] eq __PACKAGE__ ? shift : __PACKAGE__ ;
@@ -159,9 +159,11 @@ sub FILENO  { fileno($_[0]->{handle}) }
 
 __END__
 =head1 NAME
+
    Tie::FileSection - restrict files sequential access using array like boundaries
 
 =head1 SYNOPSIS
+
    use Tie::FileSection;
    my $filename = 'some/text/file.txt';
    #Lines are indexed starting from 1
@@ -187,6 +189,7 @@ __END__
    say <$Footer>;
 
 =head1 DESCRIPTION
+
    `Tie::FileSection` represent a regular text file specified by the file name, with boundaries 
    to restrict to a specific section of the file. It is possible to use negative boundaries that
    will be relative to the end of the file. It is designed to works for sequential read accesses.
@@ -195,8 +198,8 @@ __END__
 
 =head2 C<new> - Create a file section and return it as a file handle.
 
-my $fh = Tie::FileSection->new ( filename => $path, first_line => $i, last_line => $end );
-my $fh = Tie::FileSection->new ( file => $FH,       first_line => $i, last_line => $end );
+   my $fh = Tie::FileSection->new ( filename => $path, first_line => $i, last_line => $end );
+   my $fh = Tie::FileSection->new ( file => $FH,       first_line => $i, last_line => $end );
 
 filename argument is the file path to read from.
 file argument is the file handle to read from.
@@ -205,17 +208,13 @@ last_line argument is the last line index in the file where the section end, omi
 
 A negative indexes is relative to the end of the file.
 
-=head1 AUTHOR
-   Nicolas Georges
-   From an idea of Emmanuel Dupuis.
-   
-=head1 LICENSE
-   Perl5 Artistic license.
-   
 =head1 WARRANTY
+
    `Tie::FileSection`comes with ABSOLUTELY NO WARRANTY. For details, see the license.
    
 =head1 TODO
+
    Add more tests
    Support random and write accesses
+   
 =cut
