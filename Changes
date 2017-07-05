@@ -1,4 +1,5 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+	add use_real_line_nr support.
 	First release.

@@ -9,26 +9,28 @@ sub new{
    my $pkg = $_[0] eq __PACKAGE__ ? shift : __PACKAGE__ ;
    my %opts = @_;
    $opts{filename} || $opts{file} or die "filename|file parameter is mandatory!";
-   my $first_line = $opts{first_line} // 0;
-   my $last_line = $opts{last_line} // 0;
+   my $first_line       = $opts{first_line} // 0;
+   my $last_line        = $opts{last_line} // 0;
+   my $use_real_line_nr = $opts{use_real_line_nr};
    my $FH = $opts{file};
    if(!$FH && defined $opts{filename}){
       open $FH, '<', $opts{filename} or die "** could not open file $opts{filename} : $!\n";
    }
-   tie *F, $pkg, $FH, $first_line, $last_line;
+   tie *F, $pkg, $FH, $first_line, $last_line, $use_real_line_nr;
    return \*F;
 }
 
 sub TIEHANDLE{
-   my ($pkg, $FH, $first_line, $last_line) = @_;
+   my ($pkg, $FH, $first_line, $last_line, $use_real_line_nr) = @_;
    my $self = bless { 
-         handle      => $FH, 
-         first_line  => $first_line,
-         last_line   => $last_line,
-         init        => 0, #lazy read
-         curr_line   => 0,
-         line_buffer => [],
-         tell_buffer => [],
+         handle           => $FH, 
+         first_line       => $first_line,
+         last_line        => $last_line,
+         init             => 0, #lazy read
+         curr_line        => 0,
+         use_real_line_nr => $use_real_line_nr,
+         line_buffer      => [],
+         tell_buffer      => [],
       }, $pkg;
    return $self;
 }
@@ -117,6 +119,7 @@ sub _readline{
          #add the final pos if requested aftere EOF.
          push @$tellbuff, tell($fh);
       }
+      $self->{curr_line} = $. if $self->{use_real_line_nr};
       $. = undef;
    }
    #read one line and return it, take in accound first_line/last_line and buffer
@@ -201,10 +204,11 @@ __END__
    my $fh = Tie::FileSection->new ( filename => $path, first_line => $i, last_line => $end );
    my $fh = Tie::FileSection->new ( file => $FH,       first_line => $i, last_line => $end );
 
-filename argument is the file path to read from.
-file argument is the file handle to read from.
-first_line argument is the first line index in the file where the section start, omit this argument to mean from start of the file.
-last_line argument is the last line index in the file where the section end, omit this argument to mean until EOF.
+   filename argument is the file path to read from.
+   file argument is the file handle to read from.
+   optional first_line argument is the first line index in the file where the section start, omit this argument to mean from start of the file.
+   optional last_line argument is the last line index in the file where the section end, omit this argument to mean until EOF.
+   optional use_real_line_nr argument when specified with a true value, will make $. to return the original line number, default to relative to the section.
 
 A negative indexes is relative to the end of the file.
 
