@@ -26,7 +26,7 @@ my $pos_orig = tell( *DATA );
 
 for my $test ( @tests ) {
    my $F = Tie::FileSection->new( file => \*DATA, first_line => $test->[0], last_line => $test->[1] );
-   cmp_ok join(' ', map{ chomp() ; $_ } <$F>), 'eq', $test->[2], $test->[3].' data';
+   cmp_ok join(' ', map{ s/[\r\n]+//r; } <$F>), 'eq', $test->[2], $test->[3].' data';
    ok eof($F), $test->[3] . ' EOF';
    seek(*DATA, $pos_orig, 0);
    
@@ -34,7 +34,7 @@ for my $test ( @tests ) {
    #pos are considered to be relative to the whole file, not to the section.(okay, a bit weired)
    $F = Tie::FileSection->new( file => \*DATA, first_line => $test->[0], last_line => $test->[1] );
    while(defined( my $line = <$F>)){
-      chomp($line);
+      $line =~ s/[\r\n]+//;
       cmp_ok( (tell($F)//0) - $pos_orig, '==', $pos{$line}, $test->[3] . " tell for '$line'");
       #~ cmp_ok $.//0, '==', $index{$line}, $test->[3] . " \$. for '$line'";
    }
