@@ -77,6 +77,7 @@ sub EOF{
 
 sub TELL { 
    my $self = shift;
+   $. = $self->{curr_line};
    return tell($self->{handle}) unless $self->{use_buffer};
    return $self->{tell_buffer}[0];
 }
@@ -119,8 +120,13 @@ sub _readline{
          #add the final pos if requested aftere EOF.
          push @$tellbuff, tell($fh);
       }
-      $self->{curr_line} = $. if $self->{use_real_line_nr};
-      $. = undef;
+      if($self->{use_real_line_nr}){
+         $. -= @$linebuff if $self->{use_buffer};
+         $self->{curr_line} = $.;
+      }
+      else {
+         $. = undef;
+      }
    }
    #read one line and return it, take in accound first_line/last_line and buffer
    my $eof = eof($fh);
