@@ -12,7 +12,8 @@ perl:
 env: PERL_CPANM_OPT="--notest --force --skip-satisfied"
 before_install:
   # bootstrap modules needed to manipulate dist
-  - "cpanm Dist::Zilla Pod::Coverage::TrustPod"
+  - "cpanm --sudo Dist::Zilla"
+  - "cpanm Pod::Coverage::TrustPod"
   # install dist development dependencies
   - "dzil authordeps | xargs cpanm"
   - "export tmpbuild=`mktemp --directory`"
