@@ -1,5 +1,6 @@
-  language: perl
+language: perl
 perl:
+  - "blead"
   - "5.26"
   - "5.24"
   - "5.22"
@@ -7,17 +8,18 @@ perl:
   - "5.10"
 
 sudo: false
-
+#Dzil config comes from https://github.com/mjgardner/svn-simple-hook/blob/master/.travis.yml
+env: PERL_CPANM_OPT="--notest --force --skip-satisfied"
 before_install:
-  - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
-  - source ~/travis-perl-helpers/init --auto
-  
-install:
-  - cpanm --quiet --notest --skip-satisfied Dist::Zilla
-  - dzil authordeps | grep -vP '[^\w:]' | cpanm --quiet --notest --skip-satisfied
-  - dzil listdeps   | grep -vP '[^\w:]' | cpanm --verbose
-script:
-  - dzil smoke --release --author
+  # bootstrap modules needed to manipulate dist
+  - "cpanm Dist::Zilla"
+  # install dist development dependencies
+  - "dzil authordeps | xargs cpanm"
+  - "export tmpbuild=`mktemp --directory`"
+  - "dzil build --in $tmpbuild"
+  - "perl -MCPAN::Meta -e '$,=\"\\n\"; print CPAN::Meta->load_file(\"$ENV{tmpbuild}/META.json\")->effective_prereqs->requirements_for(\"develop\", \"requires\")->required_modules' | xargs cpanm"
+install: "dzil listdeps | xargs cpanm"
+script: "dzil test --release"
 
 notifications:
   recipients:
