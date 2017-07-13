@@ -6,7 +6,8 @@ my $line_ori= $.;
 sub getline{ 
 	my $fh = shift;
 	$_ = <$fh>;
-	s/[\r\n]+//r; 
+	s/[\r\n]+//;
+	$_;
 }
 
 sub reset_DATA{

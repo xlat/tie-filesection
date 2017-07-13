@@ -1,5 +1,6 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+	make compatibility with perl 5.10.0
 	add use_real_line_nr support.
 	First release.
