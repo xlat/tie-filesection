@@ -6,7 +6,9 @@ perl:
   - "5.22"
   - "5.20.1"
   - "5.10"
-
+matrix:
+  allow_failures:
+    - perl: blead       # ignore failures for blead perl
 #sudo: false
 #Dzil config comes from https://github.com/mjgardner/svn-simple-hook/blob/master/.travis.yml
 env: PERL_CPANM_OPT="--notest --force --skip-satisfied"
@@ -16,6 +18,8 @@ before_install:
   - "cpanm Pod::Coverage::TrustPod"
   # install dist development dependencies
   - "dzil authordeps | xargs cpanm"
+  #not detected on blead
+  - "cpanm Dist::Zilla::Plugin::PodWeaver"
   - "export tmpbuild=`mktemp --directory`"
   - "dzil build --in $tmpbuild"
   - "perl -MCPAN::Meta -e '$,=\"\\n\"; print CPAN::Meta->load_file(\"$ENV{tmpbuild}/META.json\")->effective_prereqs->requirements_for(\"develop\", \"requires\")->required_modules' | xargs cpanm"
